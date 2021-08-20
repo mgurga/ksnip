@@ -165,6 +165,7 @@ private slots:
 	void setPosition();
 	void handleGuiStartup();
 	void saveClicked();
+    void tesseractScan();
 	void saveAsClicked();
 	void updateApplicationTitle();
 	void capturePostProcessing();

@@ -27,6 +27,7 @@ MainToolBar::MainToolBar(const QList<CaptureModes> &captureModes, QAction* undoA
 	mCropButton(new QToolButton(this)),
 	mUndoButton(new QToolButton(this)),
 	mRedoButton(new QToolButton(this)),
+    mTesseractButton(new QToolButton(this)),
 	mCaptureModePicker(new CaptureModePicker(captureModes)),
 	mDelayPicker(new CustomSpinBox(0,100)),
 	mDelayLabel(new QLabel),
@@ -35,7 +36,8 @@ MainToolBar::MainToolBar(const QList<CaptureModes> &captureModes, QAction* undoA
 	mCopyAction(new QAction(this)),
 	mCropAction(new QAction(this)),
 	mUndoAction(undoAction),
-	mRedoAction(redoAction)
+    mRedoAction(redoAction),
+    mTesseractAction(new QAction(this))
 {
     connect(mCaptureModePicker, &CaptureModePicker::captureModeSelected, this, &MainToolBar::captureModeSelected);
 
@@ -64,6 +66,10 @@ MainToolBar::MainToolBar(const QList<CaptureModes> &captureModes, QAction* undoA
     mCropButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     mCropButton->addAction(mCropAction);
     mCropButton->setDefaultAction(mCropAction);
+
+    mTesseractButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    mTesseractButton->addAction(mTesseractAction);
+    mTesseractButton->setDefaultAction(mTesseractAction);
 
 	auto clockIcon = IconLoader::loadForTheme(QLatin1String("clock.svg"));
 	auto clockPixmap = clockIcon.pixmap(ScaledSizeProvider::scaledSize(QSize(24, 24)));
@@ -102,6 +108,12 @@ MainToolBar::MainToolBar(const QList<CaptureModes> &captureModes, QAction* undoA
     mCropAction->setShortcut(Qt::SHIFT + Qt::Key_C);
     connect(mCropAction, &QAction::triggered, this, &MainToolBar::cropActionTriggered);
 
+    mTesseractAction->setText(tr("Tesseract Scan"));
+    mTesseractAction->setToolTip(tr("Scan with OCR"));
+    mTesseractAction->setIcon(IconLoader::loadForTheme(QLatin1String("crop.svg")));
+    mTesseractAction->setShortcut(Qt::SHIFT + Qt::Key_T);
+    connect(mTesseractAction, &QAction::triggered, this, &MainToolBar::tesseractActionTriggered);
+
     setWindowTitle(tr("Tools"));
     setFloatable(false);
     setMovable(false);
@@ -112,6 +124,7 @@ MainToolBar::MainToolBar(const QList<CaptureModes> &captureModes, QAction* undoA
     addWidget(mCopyButton);
     addWidget(mUndoButton);
     addWidget(mRedoButton);
+    addWidget(mTesseractButton);
     addSeparator();
     addWidget(mCropButton);
     addSeparator();
@@ -128,6 +141,7 @@ MainToolBar::~MainToolBar()
     delete mCropButton;
     delete mUndoButton;
     delete mRedoButton;
+    delete mTesseractButton;
     delete mCaptureModePicker;
     delete mDelayPicker;
     delete mNewCaptureAction;
@@ -136,6 +150,7 @@ MainToolBar::~MainToolBar()
     delete mCropAction;
     delete mUndoAction;
     delete mRedoAction;
+    delete mTesseractAction;
 }
 
 void MainToolBar::selectCaptureMode(CaptureModes captureModes)
@@ -168,6 +183,11 @@ void MainToolBar::setCropEnabled(bool enabled)
     mCropAction->setEnabled(enabled);
 }
 
+void MainToolBar::setTesseractEnabled(bool enabled)
+{
+    mTesseractAction->setEnabled(enabled);
+}
+
 QAction *MainToolBar::newCaptureAction() const
 {
     return mNewCaptureAction;
@@ -196,6 +216,11 @@ QAction *MainToolBar::undoAction() const
 QAction *MainToolBar::redoAction() const
 {
     return mRedoAction;
+}
+
+QAction *MainToolBar::tesseractAction() const
+{
+    return mTesseractAction;
 }
 
 QList<QAction *> MainToolBar::captureActions() const

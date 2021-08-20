@@ -19,6 +19,8 @@
  */
 
 #include "MainWindow.h"
+#include "tesseract/baseapi.h"
+#include "leptonica/allheaders.h"
 
 MainWindow::MainWindow(AbstractImageGrabber *imageGrabber, RunMode mode) :
 	QMainWindow(),
@@ -357,6 +359,7 @@ void MainWindow::setEnablements(bool enabled)
     mAddWatermarkAction->setEnabled(enabled);
     mToolBar->setCopyActionEnabled(enabled);
     mToolBar->setCropEnabled(enabled);
+    mToolBar->setTesseractEnabled(enabled);
     mSaveAsAction->setEnabled(enabled);
     mPinAction->setEnabled(enabled);
     mPasteEmbeddedAction->setEnabled(mClipboard->isPixmap() && mImageAnnotator->isVisible());
@@ -421,6 +424,7 @@ void MainWindow::initGui()
     connect(mToolBar, &MainToolBar::copyActionTriggered, this, &MainWindow::copyCaptureToClipboard);
     connect(mToolBar, &MainToolBar::captureDelayChanged, this, &MainWindow::captureDelayChanged);
     connect(mToolBar, &MainToolBar::cropActionTriggered, mImageAnnotator, &IImageAnnotator::showCropper);
+    connect(mToolBar, &MainToolBar::tesseractActionTriggered, this, &MainWindow::tesseractScan);
 
 	mSaveAsAction->setText(tr("Save As..."));
 	mSaveAsAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_S);
@@ -557,6 +561,7 @@ void MainWindow::initGui()
     menu->addAction(mPasteEmbeddedAction);
 	menu->addSeparator();
     menu->addAction(mToolBar->cropAction());
+    menu->addAction(mToolBar->tesseractAction());
     menu->addAction(mScaleAction);
     menu->addAction(mRotateAction);
     menu->addAction(mAddWatermarkAction);
@@ -716,6 +721,38 @@ void MainWindow::pasteEmbeddedFromClipboard()
 void MainWindow::saveClicked()
 {
 	mCaptureHandler->save();
+}
+
+void MainWindow::tesseractScan()
+{
+    mCaptureHandler->save();
+    char *out;
+
+    // init tesseract
+    tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
+    if(api->Init(NULL, "eng")) {
+        fprintf(stderr, "Could not initialize tesseract.\n");
+        exit(1);
+    }
+
+    // open image
+    Pix *img = pixRead(mCaptureHandler->path().toStdString().c_str());
+    api->SetImage(img);
+    out = api->GetUTF8Text();
+
+    // cleanup
+    api->End();
+    delete api;
+    pixDestroy(&img);
+
+    QMessageBox msg;
+    msg.setWindowTitle(tr("Tesseract Scan Results"));
+    msg.setText(out);
+    msg.setStandardButtons(QMessageBox::Ok);
+    msg.setDefaultButton(QMessageBox::Ok);
+    msg.exec();
+
+    delete [] out;
 }
 
 void MainWindow::saveAsClicked()

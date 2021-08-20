@@ -40,12 +40,14 @@ public:
     void setSaveActionEnabled(bool enabled);
     void setCopyActionEnabled(bool enabled);
     void setCropEnabled(bool enabled);
+    void setTesseractEnabled(bool enabled);
     QAction* newCaptureAction() const;
     QAction* saveAction() const;
     QAction* copyToClipboardAction() const;
     QAction* cropAction() const;
     QAction* undoAction() const;
     QAction* redoAction() const;
+    QAction* tesseractAction() const;
     QList<QAction*> captureActions() const;
     void setCollapsed(bool isCollapsed);
     bool isCollapsed() const;
@@ -56,6 +58,7 @@ signals:
     void copyActionTriggered() const;
     void captureDelayChanged(int delay) const;
     void cropActionTriggered() const;
+    void tesseractActionTriggered() const;
 
 public slots:
     void newCaptureTriggered();
@@ -66,6 +69,7 @@ private:
     QToolButton *mCropButton;
     QToolButton *mUndoButton;
     QToolButton *mRedoButton;
+    QToolButton *mTesseractButton;
     CaptureModePicker *mCaptureModePicker;
     CustomSpinBox *mDelayPicker;
     QLabel *mDelayLabel;
@@ -75,6 +79,7 @@ private:
     QAction *mCropAction;
     QAction *mUndoAction;
     QAction *mRedoAction;
+    QAction *mTesseractAction;
 };
 
 #endif //KSNIP_MAINTOOLBAR_H

@@ -236,6 +236,8 @@ elseif (UNIX)
 		kImageAnnotator::kImageAnnotator
 		kColorPicker::kColorPicker
 		XCB::XFIXES
+                tesseract
+                leptonica
 		)
 
 	# X11::X11 imported target only available with sufficiently new CMake
